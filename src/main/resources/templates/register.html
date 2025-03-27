@@ -1,0 +1,396 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>注册 - 智能聊天助手</title>
+    <style>
+        :root {
+            --primary-color: #4a6fa5;        /* 主色调：深蓝色 */
+            --primary-light: #7798c8;        /* 浅蓝色 */
+            --accent-color: #5e97f6;         /* 亮蓝色 */
+            --background-color: #f9fafc;     /* 背景色 */
+            --text-color: #333;              /* 主要文本颜色 */
+            --light-text: #f9f9f9;           /* 浅色文本 */
+            --border-radius: 12px;           /* 统一的圆角大小 */
+            --error-color: #e53935;          /* 错误提示颜色 */
+            --success-color: #43a047;        /* 成功提示颜色 */
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+            background-color: var(--background-color);
+            color: var(--text-color);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-image: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+        }
+
+        .register-container {
+            width: 360px;
+            background-color: white;
+            border-radius: var(--border-radius);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+
+        .register-header {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 25px 0;
+            text-align: center;
+        }
+
+        .register-header h1 {
+            margin: 0;
+            font-size: 22px;
+            font-weight: 500;
+        }
+
+        .register-header p {
+            margin-top: 5px;
+            font-size: 14px;
+            opacity: 0.8;
+        }
+
+        .register-header .logo {
+            width: 70px;
+            height: 70px;
+            margin: 0 auto 15px;
+            background-color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .logo img {
+            width: 50px;
+            height: 50px;
+        }
+
+        .register-form {
+            padding: 30px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+            position: relative;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-size: 14px;
+            color: #666;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 12px 15px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 14px;
+            transition: all 0.3s;
+        }
+
+        .form-group input:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 2px rgba(74, 111, 165, 0.2);
+            outline: none;
+        }
+
+        .register-button {
+            width: 100%;
+            padding: 12px;
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 16px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-top: 10px;
+        }
+
+        .register-button:hover {
+            background-color: var(--accent-color);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 10px rgba(94, 151, 246, 0.3);
+        }
+
+        .login-link {
+            text-align: center;
+            margin-top: 20px;
+            font-size: 14px;
+            color: #777;
+        }
+
+        .login-link a {
+            color: var(--primary-color);
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        .login-link a:hover {
+            text-decoration: underline;
+        }
+
+        .alert {
+            padding: 10px 15px;
+            border-radius: 4px;
+            margin-bottom: 20px;
+            font-size: 14px;
+            display: none;
+        }
+
+        .alert-error {
+            background-color: rgba(229, 57, 53, 0.1);
+            color: var(--error-color);
+            border: 1px solid rgba(229, 57, 53, 0.3);
+        }
+
+        .alert-success {
+            background-color: rgba(67, 160, 71, 0.1);
+            color: var(--success-color);
+            border: 1px solid rgba(67, 160, 71, 0.3);
+        }
+
+        /* 密码可见性切换按钮 */
+        .toggle-password {
+            position: absolute;
+            right: 12px;
+            top: 38px;
+            color: #aaa;
+            cursor: pointer;
+            user-select: none;
+        }
+
+        .toggle-password:hover {
+            color: var(--primary-color);
+        }
+
+        /* 响应式设计 */
+        @media screen and (max-width: 480px) {
+            .register-container {
+                width: 90%;
+                max-width: 350px;
+            }
+
+            .register-form {
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="register-container">
+        <div class="register-header">
+            <div class="logo">
+                <svg width="40" height="40" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M12 2C6.48 2 2 6.48 2 12C2 17.52 6.48 22 12 22C17.52 22 22 17.52 22 12C22 6.48 17.52 2 12 2ZM12 5C13.66 5 15 6.34 15 8C15 9.66 13.66 11 12 11C10.34 11 9 9.66 9 8C9 6.34 10.34 5 12 5ZM12 19.2C9.5 19.2 7.29 17.92 6 15.98C6.03 13.99 10 12.9 12 12.9C13.99 12.9 17.97 13.99 18 15.98C16.71 17.92 14.5 19.2 12 19.2Z" fill="#4a6fa5"/>
+                </svg>
+            </div>
+            <h1>创建账号</h1>
+            <p>智能聊天助手 - 加入我们</p>
+        </div>
+
+        <div class="register-form">
+            <div class="alert alert-error" id="errorAlert"></div>
+            <div class="alert alert-success" id="successAlert"></div>
+
+            <form id="registerForm">
+                <div class="form-group">
+                    <label for="username">用户名</label>
+                    <input type="text" id="username" name="username" placeholder="请输入用户名" autocomplete="username" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="email">电子邮箱</label>
+                    <input type="email" id="email" name="email" placeholder="请输入邮箱" autocomplete="email" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="password">密码</label>
+                    <input type="password" id="password" name="password" placeholder="请输入密码" autocomplete="new-password" required>
+                    <span class="toggle-password" id="togglePassword">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M1 12C1 12 5 4 12 4C19 4 23 12 23 12C23 12 19 20 12 20C5 20 1 12 1 12Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            <path d="M12 15C13.6569 15 15 13.6569 15 12C15 10.3431 13.6569 9 12 9C10.3431 9 9 10.3431 9 12C9 13.6569 10.3431 15 12 15Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                    </span>
+                </div>
+
+                <div class="form-group">
+                    <label for="confirmPassword">确认密码</label>
+                    <input type="password" id="confirmPassword" name="confirmPassword" placeholder="请再次输入密码" autocomplete="new-password" required>
+                    <span class="toggle-password" id="toggleConfirmPassword">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M1 12C1 12 5 4 12 4C19 4 23 12 23 12C23 12 19 20 12 20C5 20 1 12 1 12Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            <path d="M12 15C13.6569 15 15 13.6569 15 12C15 10.3431 13.6569 9 12 9C10.3431 9 9 10.3431 9 12C9 13.6569 10.3431 15 12 15Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                    </span>
+                </div>
+
+                <button type="submit" class="register-button">注册</button>
+            </form>
+
+            <div class="login-link">
+                已有账号? <a href="/login">立即登录</a>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 切换密码可见性 (密码字段)
+        document.getElementById('togglePassword').addEventListener('click', function() {
+            const passwordInput = document.getElementById('password');
+            const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+            passwordInput.setAttribute('type', type);
+
+            // 切换图标
+            if (type === 'text') {
+                this.innerHTML = `
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M2 12C2 12 5.63636 5 12 5C18.3636 5 22 12 22 12C22 12 18.3636 19 12 19C5.63636 19 2 12 2 12Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        <path d="M12 15C13.6569 15 15 13.6569 15 12C15 10.3431 13.6569 9 12 9C10.3431 9 9 10.3431 9 12C9 13.6569 10.3431 15 12 15Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        <path d="M3 3L21 21" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                `;
+            } else {
+                this.innerHTML = `
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M1 12C1 12 5 4 12 4C19 4 23 12 23 12C23 12 19 20 12 20C5 20 1 12 1 12Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        <path d="M12 15C13.6569 15 15 13.6569 15 12C15 10.3431 13.6569 9 12 9C10.3431 9 9 10.3431 9 12C9 13.6569 10.3431 15 12 15Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                `;
+            }
+        });
+
+        // 切换密码可见性 (确认密码字段)
+        document.getElementById('toggleConfirmPassword').addEventListener('click', function() {
+            const confirmPasswordInput = document.getElementById('confirmPassword');
+            const type = confirmPasswordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+            confirmPasswordInput.setAttribute('type', type);
+
+            // 切换图标
+            if (type === 'text') {
+                this.innerHTML = `
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M2 12C2 12 5.63636 5 12 5C18.3636 5 22 12 22 12C22 12 18.3636 19 12 19C5.63636 19 2 12 2 12Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        <path d="M12 15C13.6569 15 15 13.6569 15 12C15 10.3431 13.6569 9 12 9C10.3431 9 9 10.3431 9 12C9 13.6569 10.3431 15 12 15Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        <path d="M3 3L21 21" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                `;
+            } else {
+                this.innerHTML = `
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M1 12C1 12 5 4 12 4C19 4 23 12 23 12C23 12 19 20 12 20C5 20 1 12 1 12Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        <path d="M12 15C13.6569 15 15 13.6569 15 12C15 10.3431 13.6569 9 12 9C10.3431 9 9 10.3431 9 12C9 13.6569 10.3431 15 12 15Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                `;
+            }
+        });
+
+        // 表单提交处理
+        document.getElementById('registerForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            console.clear(); // 清除之前的控制台日志
+
+            const username = document.getElementById('username').value;
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            const confirmPassword = document.getElementById('confirmPassword').value;
+
+            const errorAlert = document.getElementById('errorAlert');
+            const successAlert = document.getElementById('successAlert');
+
+            // 基本验证
+            if (!username || !email || !password || !confirmPassword) {
+                errorAlert.textContent = '请填写所有必填字段';
+                errorAlert.style.display = 'block';
+                successAlert.style.display = 'none';
+                return;
+            }
+
+            if (password !== confirmPassword) {
+                errorAlert.textContent = '两次输入的密码不一致';
+                errorAlert.style.display = 'block';
+                successAlert.style.display = 'none';
+                return;
+            }
+
+            // 验证邮箱格式
+            const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (!emailPattern.test(email)) {
+                errorAlert.textContent = '请输入有效的电子邮箱地址';
+                errorAlert.style.display = 'block';
+                successAlert.style.display = 'none';
+                return;
+            }
+
+            // 准备要发送的数据
+            const requestData = {
+                username: username,
+                email: email,
+                password: password
+            };
+            console.log('发送注册请求:', requestData);
+
+            // 发送注册请求
+            fetch('/api/register', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(requestData),
+            })
+            .then(response => {
+                console.log('收到响应状态:', response.status);
+                return response.json().then(data => {
+                    console.log('响应数据:', data);
+                    return {
+                        status: response.status,
+                        ok: response.ok,
+                        data: data
+                    };
+                });
+            })
+            .then(result => {
+                if (result.ok) {
+                    // 注册成功
+                    errorAlert.style.display = 'none';
+                    successAlert.textContent = result.data.message || '注册成功！正在跳转到登录页面...';
+                    successAlert.style.display = 'block';
+
+                    // 跳转到登录页面
+                    setTimeout(function() {
+                        window.location.href = '/login';
+                    }, 2000);
+                } else {
+                    // 注册失败
+                    errorAlert.textContent = result.data.message || '注册失败，请稍后再试';
+                    errorAlert.style.display = 'block';
+                    successAlert.style.display = 'none';
+                }
+            })
+            .catch(error => {
+                // 网络或其他错误
+                console.error('注册请求错误:', error);
+                errorAlert.textContent = '网络错误，请稍后再试';
+                errorAlert.style.display = 'block';
+                successAlert.style.display = 'none';
+            });
+        });
+    </script>
+</body>
+</html>

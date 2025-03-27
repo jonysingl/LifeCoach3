@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>智能聊天助手</title>
+    <!-- 添加Font Awesome图标库 -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <!-- 修改 chatbot.css 的路径 -->
+    <link rel="stylesheet" href="../css/chatbot.css">
+</head>
+<body>
+<!-- 登录按钮 - 改为链接形式 -->
+<a href="login" class="login-button" id="loginButton">
+    <div class="avatar">
+        <i class="fa fa-user"></i>
+    </div>
+    <span id="loginText">登录</span>
+</a>
+
+<!-- 侧边栏 -->
+<div class="sidebar" id="sidebar">
+    <button id="newConversationButton">开启新对话</button>
+    <div id="conversationHistory">
+        <div class="history-title">对话历史</div>
+        <!-- 历史记录将通过JavaScript动态添加 -->
+    </div>
+</div>
+
+<!-- 侧边栏开关按钮 -->
+<button class="toggle-button" id="toggleButton">
+    <span id="toggleIcon">≡</span>
+</button>
+
+<!-- 内容区域 -->
+<div class="content" id="main">
+    <!-- 聊天头部 -->
+    <div class="chat-header">
+        <h1>智能聊天助手</h1>
+        <p>随时为您解答问题</p>
+    </div>
+
+    <!-- 聊天输出区域 -->
+    <div class="chat-output" id="chatOutput"></div>
+
+    <!-- 打字指示器 -->
+    <div class="typing-indicator" id="typingIndicator" style="display: none;">
+        <span></span>
+        <span></span>
+        <span></span>
+    </div>
+
+    <!-- 输入区域 -->
+    <div class="chat-input">
+        <input type="text" id="chatInput" placeholder="请输入聊天内容">
+        <button id="sendButton">发送</button>
+    </div>
+</div>
+
+<!-- 修正 chatbot.js 的路径 -->
+<script src="../js/chatbot.js"></script>
+</body>
+</html>
