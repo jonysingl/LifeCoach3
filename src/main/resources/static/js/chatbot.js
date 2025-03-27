@@ -74,19 +74,6 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // 初始状态显示欢迎消息
     showWelcomeMessage();
-
-    // 添加事件监听器
-    var chatInput = document.getElementById('chatInput');
-    var sendButton = document.getElementById('sendButton');
-    var chatOutput = document.getElementById('chatOutput');
-
-    sendButton.addEventListener('click', sendMessage);
-
-    chatInput.addEventListener('keypress', function(event) {
-        if (event.key === 'Enter') {
-            sendMessage();
-        }
-    });
 });
 
 // 显示欢迎消息
@@ -467,10 +454,7 @@ function addTimestamp(element, date) {
 
 // 发送消息
 function sendMessage() {
-    var chatInput = document.getElementById('chatInput');
-    var chatOutput = document.getElementById('chatOutput');
     var message = chatInput.value.trim();
-
     if (message) {
         // 如果用户已登录但没有当前对话，先创建一个新对话
         if (currentUser && !currentConversationId) {
@@ -598,29 +582,42 @@ function sendMessageToAPI(message, conversationId) {
 }
 
 // 侧边栏切换
+document.getElementById('toggleButton').addEventListener('click', function () {
+    var sidebar = document.getElementById('sidebar');
+    var main = document.getElementById('main');
+    var toggleIcon = document.getElementById('toggleIcon');
+
+    sidebar.classList.toggle('hidden');
+    main.classList.toggle('hidden-sidebar');
+
+    // 更改图标
+    if (sidebar.classList.contains('hidden')) {
+        toggleIcon.textContent = '☰';
+    } else {
+        toggleIcon.textContent = '✖';
+    }
+});
+
+// 新对话按钮
+document.getElementById('newConversationButton').addEventListener('click', function() {
+    // 清空当前对话ID，这样在用户发送新消息时会创建新对话
+    currentConversationId = null;
+
+    // 创建新对话
+    createNewConversation();
+});
+
+// 添加事件监听器
 document.addEventListener('DOMContentLoaded', function() {
-    document.getElementById('toggleButton').addEventListener('click', function () {
-        var sidebar = document.getElementById('sidebar');
-        var main = document.getElementById('main');
-        var toggleIcon = document.getElementById('toggleIcon');
+    var chatInput = document.getElementById('chatInput');
+    var sendButton = document.getElementById('sendButton');
+    var chatOutput = document.getElementById('chatOutput');
 
-        sidebar.classList.toggle('hidden');
-        main.classList.toggle('hidden-sidebar');
+    sendButton.addEventListener('click', sendMessage);
 
-        // 更改图标
-        if (sidebar.classList.contains('hidden')) {
-            toggleIcon.textContent = '☰';
-        } else {
-            toggleIcon.textContent = '✖';
+    chatInput.addEventListener('keypress', function(event) {
+        if (event.key === 'Enter') {
+            sendMessage();
         }
-    });
-
-    // 新对话按钮
-    document.getElementById('newConversationButton').addEventListener('click', function() {
-        // 清空当前对话ID，这样在用户发送新消息时会创建新对话
-        currentConversationId = null;
-
-        // 创建新对话
-        createNewConversation();
     });
 });

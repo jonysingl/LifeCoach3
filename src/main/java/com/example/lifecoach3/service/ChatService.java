@@ -1,8 +1,6 @@
 package com.example.lifecoach3.service;
 
-import com.example.lifecoach3.model.Conversation;
-import com.example.lifecoach3.model.Message;
-import org.springframework.stereotype.Service;
+
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
