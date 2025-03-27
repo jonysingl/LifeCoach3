@@ -148,6 +148,9 @@ function loadConversations() {
 
                         // 点击加载对话内容
                         convItem.addEventListener('click', function(e) {
+                            // 检查点击事件是否触发
+                            console.log('历史记录项被点击，ID:', conv.conversation_id);
+
                             // 忽略点击菜单触发器和菜单项时的事件
                             if (e.target.closest('.conversation-menu-trigger') || e.target.closest('.conversation-menu')) {
                                 return;
@@ -331,40 +334,73 @@ function loadConversationMessages(conversationId) {
 
     currentConversationId = conversationId;
 
+    // 添加调试日志
+    console.log('开始加载会话消息，会话ID:', conversationId);
+
+    // 显示加载状态
+    const chatOutput = document.getElementById('chatOutput');
+    chatOutput.innerHTML = '<div class="loading-message">正在加载聊天记录...</div>';
+
     fetch(`/api/conversations/${conversationId}/messages`)
         .then(response => {
             if (!response.ok) {
-                throw new Error('获取对话消息失败');
+                throw new Error(`获取对话消息失败，状态码: ${response.status}`);
             }
             return response.json();
         })
         .then(data => {
-            if (data.success) {
-                const chatOutput = document.getElementById('chatOutput');
-                chatOutput.innerHTML = '';
+            console.log('API返回历史消息数据:', data); // 调试日志
 
+            chatOutput.innerHTML = '';
+
+            if (data.success) {
                 currentMessages = data.messages || [];
 
                 // 显示所有消息
                 if (currentMessages.length > 0) {
                     currentMessages.forEach(msg => {
+                        // 检查消息格式
+                        if (!msg.user_message && !msg.bot_response) {
+                            console.warn('历史消息格式不正确:', msg);
+                            return; // 跳过无效消息
+                        }
+
                         // 用户消息
                         const userMsg = document.createElement('div');
                         userMsg.className = 'user-message';
-                        userMsg.textContent = msg.user_message;
+
+                        // 创建消息文本容器
+                        const userTextContainer = document.createElement('span');
+                        userTextContainer.className = 'message-text';
+                        userTextContainer.textContent = msg.user_message || '';
+                        userMsg.appendChild(userTextContainer);
+
+                        // 添加时间戳
                         addTimestamp(userMsg, new Date(msg.created_at));
                         chatOutput.appendChild(userMsg);
 
                         // 机器人回复
                         const botMsg = document.createElement('div');
                         botMsg.className = 'response-message';
-                        botMsg.textContent = msg.bot_response;
+
+                        // 创建回复文本容器
+                        const botTextContainer = document.createElement('span');
+                        botTextContainer.className = 'message-text';
+                        botTextContainer.textContent = msg.bot_response || '';
+                        botMsg.appendChild(botTextContainer);
+
+                        // 添加时间戳
                         addTimestamp(botMsg, new Date(msg.created_at));
                         chatOutput.appendChild(botMsg);
                     });
 
                     // 滚动到底部
                     chatOutput.scrollTop = chatOutput.scrollHeight;
+                    console.log('历史消息加载完成，消息数量:', currentMessages.length);
+                } else {
+                    // 无消息时显示提示
+                    chatOutput.innerHTML = '<div class="empty-message">没有历史消息记录</div>';
+                    console.log('没有历史消息记录');
                 }
 
                 // 如果在移动设备上，加载消息后关闭侧边栏
@@ -373,11 +409,20 @@ function loadConversationMessages(conversationId) {
                     document.getElementById('main').classList.add('hidden-sidebar');
                     document.getElementById('toggleIcon').textContent = '☰';
                 }
+            } else {
+                // API返回失败
+                chatOutput.innerHTML = '<div class="error-message">加载聊天记录失败: ' +
+                    (data.message || '未知错误') + '</div>';
+                console.error('API返回失败:', data);
             }
         })
         .catch(error => {
             console.error('加载对话消息失败:', error);
+            // 向用户显示错误信息
+            chatOutput.innerHTML = '<div class="error-message">加载聊天记录失败: ' +
+                error.message + '</div>';
         });
+
 }
 
 // 创建新对话
@@ -536,6 +581,26 @@ function sendMessage() {
 
 // 发送消息到API
 function sendMessageToAPI(message, conversationId) {
+    // 获取聊天输出区域
+    const chatOutput = document.getElementById('chatOutput');
+
+    // 先添加固定语句回答
+    var initialResponseElement = document.createElement('div');
+    initialResponseElement.className = 'response-message';
+
+    // 创建消息文本容器
+    var textContainer = document.createElement('span');
+    textContainer.className = 'message-text';
+    textContainer.textContent = "我正在思考您的问题，请稍等..."; // 固定语句
+    initialResponseElement.appendChild(textContainer);
+
+    // 添加时间戳
+    addTimestamp(initialResponseElement);
+
+    // 添加到聊天输出
+    chatOutput.appendChild(initialResponseElement);
+    chatOutput.scrollTop = chatOutput.scrollHeight;
+
     // 构建API URL
     let apiUrl = `/get?msg=${encodeURIComponent(message)}`;
     if (conversationId) {
@@ -548,16 +613,12 @@ function sendMessageToAPI(message, conversationId) {
         .then(data => {
             // 隐藏打字指示器
             var typingIndicator = document.getElementById('typingIndicator');
-            typingIndicator.style.display = 'none';
+            if (typingIndicator) {
+                typingIndicator.style.display = 'none';
+            }
 
-            // 显示回复消息
-            var responseMessageElement = document.createElement('div');
-            responseMessageElement.className = 'response-message';
-            responseMessageElement.textContent = data.response;
-            addTimestamp(responseMessageElement);
-            chatOutput.appendChild(responseMessageElement);
-
-            chatOutput.scrollTop = chatOutput.scrollHeight;
+            // 只更新文本容器的内容，而不是整个元素
+            textContainer.textContent = data.response || "抱歉，我没有得到有效的回答";
 
             // 如果用户已登录，刷新历史记录
             if (currentUser) {
@@ -567,18 +628,17 @@ function sendMessageToAPI(message, conversationId) {
         })
         .catch(error => {
             var typingIndicator = document.getElementById('typingIndicator');
-            typingIndicator.style.display = 'none';
+            if (typingIndicator) {
+                typingIndicator.style.display = 'none';
+            }
             console.error('获取回复失败:', error);
 
-            // 显示错误消息
-            var errorMessageElement = document.createElement('div');
-            errorMessageElement.className = 'response-message error';
-            errorMessageElement.textContent = '抱歉，发生错误，请稍后重试。';
-            addTimestamp(errorMessageElement);
-            chatOutput.appendChild(errorMessageElement);
-
+            // 修改文本容器为错误信息，而不是整个元素
+            textContainer.textContent = '抱歉，发生错误，请稍后重试。';
+            initialResponseElement.className = 'response-message error';
             chatOutput.scrollTop = chatOutput.scrollHeight;
         });
+
 }
 
 // 侧边栏切换
